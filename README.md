@@ -23,33 +23,6 @@ npm run preview      # serve the build on http://localhost:4173
    - confidence below 65% → **NO CONTEST**
    - otherwise → **CAT WINS** or **DOG WINS**
 
-## Deploy to Vercel (first time)
-
-1. Create a free account at <https://github.com> and <https://vercel.com>.
-2. Install Git if you do not have it: <https://git-scm.com/download/win>.
-3. In this folder, run:
-
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: CAT v DOG"
-   ```
-
-4. Create a new empty repository on GitHub (no README, no .gitignore). Then:
-
-   ```bash
-   git remote add origin https://github.com/YOUR-NAME/catdog-arena.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-5. In Vercel, click **Add New → Project**, import the GitHub repository. Vercel auto-detects Vite; the defaults (build command `npm run build`, output `dist`) are correct. Click **Deploy**.
-6. You get a live URL like `https://catdog-arena.vercel.app`. Every future `git push` to `main` redeploys automatically.
-
-### Deploy to GitHub Pages instead
-
-The build uses `base: './'`, so it also works from a subfolder. Enable Pages in the repo settings (Source: GitHub Actions or the `dist` folder) and the same build runs at `https://YOUR-NAME.github.io/catdog-arena/`.
-
 ## Motion
 
 The page respects your system's "reduce motion" preference and starts in **Motion: off** when it is on. Click **Motion** in the header to turn the rain, the fight and the transitions on. The preference is remembered for the session only.
