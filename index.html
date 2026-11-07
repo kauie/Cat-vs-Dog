@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="sharp" data-buttons="solid" data-motion>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CAT v DOG — one photo, one verdict</title>
+  <meta name="description" content="Drop one photo. A MobileNet trained on 12,000 cats and dogs picks a side. The verdict runs in your browser; the photo is never uploaded.">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="software">
+  <meta name="theme-color" content="#0a0a0b">
+  <meta property="og:title" content="CAT v DOG — one photo, one verdict">
+  <meta property="og:description" content="Drop one photo. The cat and the dog settle it. Nothing leaves your browser.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <script>
+    document.documentElement.dataset.motion =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'calm' : 'full';
+  </script>
+</head>
+<body>
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <a class="skip" href="#arena">Skip to the arena</a>
+
+  <header class="rail">
+    <div class="wrap rail-inner">
+      <a class="wordmark" href="#top" aria-label="CAT v DOG, back to the top">
+        <span class="wordmark-cat">CAT</span><span class="wordmark-v" aria-hidden="true">v</span><span class="wordmark-dog">DOG</span>
+      </a>
+      <p class="rail-meta">A MobileNet with opinions</p>
+      <nav class="rail-nav" aria-label="Main">
+        <a href="#call">The call</a>
+        <a href="#arena">Arena</a>
+        <button class="motion" id="motion" type="button" aria-label="Motion" aria-pressed="true">
+          <i aria-hidden="true"></i><span id="motionLabel">Motion: on</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-title">
+            <span>Cat or dog.</span>
+            <span>One photo.</span>
+            <span>Let them fight.</span>
+          </h1>
+          <p class="lede">Drop a single photo. A MobileNet trained on 12,000 pets picks a side. The loser gets rained on. Nothing leaves your browser.</p>
+          <dl class="facts">
+            <div><dt>Training photos</dt><dd>12,000</dd></div>
+            <div><dt>Draw threshold</dt><dd>65%</dd></div>
+            <div><dt>Photos uploaded</dt><dd>0</dd></div>
+          </dl>
+        </div>
+
+        <div class="arena" id="arena" data-phase="warmup" data-drag="false">
+          <div class="scorebar">
+            <div class="corner corner-cat" aria-hidden="true">
+              <span>Cat</span><b id="catScore">--</b>
+            </div>
+            <div class="phase">
+              <i class="phase-dot" aria-hidden="true"></i>
+              <span id="phaseText" role="status" aria-live="polite">Warming up</span>
+            </div>
+            <div class="corner corner-dog" aria-hidden="true">
+              <b id="dogScore">--</b><span>Dog</span>
+            </div>
+          </div>
+
+          <div class="stage" id="stage">
+            <div class="stage-grid" aria-hidden="true"></div>
+
+            <div class="idle-panel" id="idlePanel">
+              <button class="drop" id="drop" type="button" aria-describedby="dropHint">
+                <span class="drop-corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="drop-plus" aria-hidden="true">+</span>
+                <span class="drop-title">Drop a photo</span>
+                <span class="drop-hint" id="dropHint">or click to browse — one contender per bout</span>
+                <span class="drop-formats">JPG · PNG · WebP · up to 12 MB</span>
+              </button>
+              <input id="file" class="sr-only" type="file" accept="image/*">
+              <div class="samples">
+                <p>No photo handy? Throw in a <span class="s-cat">cat</span>, a <span class="s-dog">dog</span>, or a toaster.</p>
+                <div class="sample-row">
+                  <button class="sample" type="button" data-sample="cat" aria-label="Try a photo of a cat">
+                    <img src="./samples/cat.jpg" alt=""><span>Cat</span>
+                  </button>
+                  <button class="sample" type="button" data-sample="dog" aria-label="Try a photo of a dog">
+                    <img src="./samples/dog.jpg" alt=""><span>Dog</span>
+                  </button>
+                  <button class="sample" type="button" data-sample="toaster" aria-label="Try a photo of a toaster">
+                    <img src="./samples/toaster.jpg" alt=""><span>Toaster</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <figure class="photo-panel" id="photoPanel" hidden>
+              <img id="preview" alt="The photo you chose">
+              <figcaption class="photo-meta">
+                <span id="fileName">photo.jpg</span>
+                <button class="link" id="replace" type="button">Replace</button>
+              </figcaption>
+            </figure>
+
+            <div class="fight" id="fight" hidden aria-hidden="true">
+              <div class="fight-shade"></div>
+              <div class="fighter fighter-cat" id="fighterCat"><img src="./emoji/1f431.svg" alt=""><span class="fighter-badge" id="badgeCat" aria-hidden="true"></span></div>
+              <div class="fighter fighter-dog" id="fighterDog"><img src="./emoji/1f436.svg" alt=""><span class="fighter-badge" id="badgeDog" aria-hidden="true"></span></div>
+              <div class="impact" id="impact">POW</div>
+              <div class="fight-caption" id="fightCaption">Round one. No rules.</div>
+              <div class="ko" id="ko">K.O.</div>
+            </div>
+
+            <div class="result-panel" id="resultPanel" hidden>
+              <div class="result-shade" aria-hidden="true"></div>
+              <div class="result-content">
+                <div class="result-stamp" id="resultStamp">CAT</div>
+                <p class="result-line" id="resultLine">The dog is appealing.</p>
+              </div>
+            </div>
+
+            <div class="error-panel" id="errorPanel" hidden>
+              <p class="error-title">That one didn't load.</p>
+              <p class="error-line" id="errorLine">Try a JPG, PNG, or WebP.</p>
+              <button class="link" id="errorReset" type="button">Start over</button>
+            </div>
+          </div>
+
+          <div class="actionbar">
+            <p class="action-hint" id="actionHint">One photo. One verdict.</p>
+            <button class="btn btn-primary" id="analyze" type="button" disabled>Analyze the photo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="call" id="call" aria-labelledby="call-title">
+      <div class="wrap">
+        <div class="call-head">
+          <h2 id="call-title">Three things decide it.</h2>
+          <p>None of them is your camera roll. The photo is read in this tab, resized to 160 × 160, and scored twice — straight and mirrored.</p>
+        </div>
+        <ol class="tape">
+          <li>
+            <span class="tape-num">01</span>
+            <div>
+              <h3>One photo, two passes</h3>
+              <p>The original and its mirror are averaged, so a sideways cat still has a fair shot.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tape-num">02</span>
+            <div>
+              <h3>Two networks</h3>
+              <p>A cat/dog head makes the call. An ImageNet gate checks it is a pet at all.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tape-num">03</span>
+            <div>
+              <h3>65% or it's a draw</h3>
+              <p>Below that, nobody wins, both emojis keep falling, and the judges take the heat.</p>
+            </div>
+          </li>
+        </ol>
+        <p class="privacy"><b>11 MB of weights, loaded once.</b> Everything after that runs on your device. The photo is never uploaded.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <p class="footer-mark"><span>CAT</span><i>v</i><span>DOG</span></p>
+      <p class="footer-note">No photos are uploaded. No pets were consulted.</p>
+      <p class="footer-credits">Emoji art: Twemoji, CC-BY 4.0 · Cat and dog photos: Unsplash · Toaster: Leon Brooks, public domain · Model: MobileNetV2, trained on the Kaggle Cats vs Dogs set.</p>
+    </div>
+  </footer>
+
+  <dialog class="verdict" id="verdict" aria-labelledby="verdictTitle">
+    <div class="verdict-card">
+      <div class="verdict-top" id="verdictTop" aria-hidden="true"></div>
+      <button class="verdict-close" id="verdictClose" type="button" aria-label="Close the verdict">×</button>
+      <p class="verdict-kicker" id="verdictKicker">The judges have decided</p>
+      <h2 class="verdict-title" id="verdictTitle" tabindex="-1">CAT WINS</h2>
+      <p class="verdict-line" id="verdictText">The dog is appealing. The appeal was denied.</p>
+      <div class="verdict-score" id="verdictScore">
+        <div class="score-row">
+          <div class="score-side score-side-cat"><span class="score-cat">CAT</span><b id="verdictCat">0%</b></div>
+          <div class="score-side score-side-dog"><span class="score-dog">DOG</span><b id="verdictDog">0%</b></div>
+        </div>
+        <div class="split" aria-hidden="true"><i class="split-cat" id="splitCat"></i><i class="split-dog" id="splitDog"></i></div>
+      </div>
+      <p class="confidence"><b id="verdictConf">0%</b><span>confidence</span></p>
+      <p class="gate-note" id="gateNote" hidden></p>
+      <div class="verdict-exhibit"><img id="verdictImg" alt="The photo you submitted"></div>
+      <div class="verdict-actions">
+        <button class="btn btn-primary" id="runBack" type="button">Run it back</button>
+        <button class="link" id="verdictStay" type="button">Keep looking at it</button>
+      </div>
+      <p class="verdict-fine">One photo per bout. The house does not accept appeals.</p>
+    </div>
+  </dialog>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "img_size": 160,
+  "dog_is_label_1": true,
+  "threshold": 0.65
+}
